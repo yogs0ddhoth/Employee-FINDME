@@ -40,16 +40,16 @@ async function init() {
       dbQuery(init, 'SELECT * FROM employees');
       break;
     case 'add a department':
-      dbQuery(init, '');
+      dbQuery(init, `INSERT INTO departments (name) VALUES ('${uiSel.name}')`);
       break;
     case 'add a role':
-      dbQuery(init, '');
+      dbQuery(init, ``);
       break;
     case 'add an employee':
-      dbQuery(init, '');
+      dbQuery(init, ``);
       break;
     case 'update an employee role':
-      dbQuery(init, '');
+      dbQuery(init, ``);
       break;
     case 'exit':
       process.exit(0);
