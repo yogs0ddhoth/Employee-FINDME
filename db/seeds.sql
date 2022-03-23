@@ -6,13 +6,13 @@ INSERT INTO departments (name)
 
 INSERT INTO roles (title, salary, department_id)
   VALUES -- 'employees'
-        ('e', 50.00, 1),
-        ('e', 100.00, 2),
-        ('e', 150.00, 3),
+        ('e_1', 50.00, 1),
+        ('e_2', 100.00, 2),
+        ('e_3', 150.00, 3),
         --  'managers'
-        ('m', 150.00, 1),
-        ('m', 200.00, 2),
-        ('m', 250.00, 3);
+        ('m_1', 150.00, 1),
+        ('m_2', 200.00, 2),
+        ('m_3', 250.00, 3);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
   VALUES
