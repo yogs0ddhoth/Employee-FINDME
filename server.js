@@ -1,16 +1,16 @@
 // require dependancies
 const inquirer = require('inquirer');
 
-// require modules
-const { Input, List } = require('./lib/prompts');
-const dbQuery = require('./lib/db');
-// const Prompt = require('inquirer/lib/prompts/base');
+// require modules:
+const { Input, List } = require('./lib/prompts'); // prompt objects
+const queryDb = require('./lib/db'); // database handler
 
 // UI functionality
 const menu = [
   'view all departments',
   'view all roles',
   'view all employees',
+  'view department budget',
   'add a department',
   'add a role',
   'add an employee',
@@ -37,6 +37,9 @@ const MenuPrompt = [
   new Input('r_id', 'Enter Role Id:', answers => answers.menu == 'add an employee'),
   new Input('m_id', 'Enter Manager Id (Enter NULL if employee is manager):', answers => answers.menu == 'add an employee'),
 
+  // If 'view department budget' is selected:
+  new Input('dep_id', 'Enter Department Id:', answers => answers.menu == 'view department budget'),
+
   // If 'update an employee role' is selected:
   new Input('emp_id', 'Enter Employee Id:', answers => answers.menu == 'update an employee role'),
   new Input('emp_r', 'Enter new Role Id:', answers => answers.menu == 'update an employee role'),
@@ -47,39 +50,47 @@ const MenuPrompt = [
 ];
 
 // Main functionality 
-async function init() {
+const init = async () => {
   const uiSel = await inquirer.prompt(MenuPrompt);
-  console.log(uiSel);
+  // handle prompt response
   switch (uiSel.menu) {
+    // call database query
     case 'view all departments':
-      dbQuery(init, 'SELECT * FROM departments');
+      queryDb('SELECT * FROM departments', init);
       break;
     case 'view all roles':
-      dbQuery(init, 'SELECT * FROM roles');
+      queryDb('SELECT * FROM roles', init);
       break;
     case 'view all employees':
-      dbQuery(init, 'SELECT * FROM employees');
+      queryDb('SELECT * FROM employees', init);
+      break;
+    case 'view department budget':
+      queryDb(`
+        SELECT d.name Department_Name, SUM(salary) Budget 
+        FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id 
+        WHERE r.department_id=${uiSel.dep_id}
+        `, init);
       break;
     case 'add a department':
-      dbQuery(init, `INSERT INTO departments (name) VALUES ('${uiSel.name}')`);
+      queryDb(`INSERT INTO departments (name) VALUES ('${uiSel.name}')`, init);
       break;
     case 'add a role':
-      dbQuery(init, `
+      queryDb(`
         INSERT INTO roles (title, salary, department_id)
         VALUES ('${uiSel.title}',${uiSel.salary},${uiSel.dep_id})
-      `);
+        `, init);
       break;
     case 'add an employee':
-      dbQuery(init, `
+      queryDb(`
         INSERT INTO employees (first_name, last_name, role_id, manager_id) 
         VALUES ('${uiSel.f_name}','${uiSel.l_name}',${uiSel.r_id},${uiSel.m_id})
-      `);
+        `, init);
       break;
     case 'update an employee role':
-      dbQuery(init, `UPDATE employees SET role_id=${uiSel.emp_r} WHERE id=${uiSel.emp_id}`);
+      queryDb(`UPDATE employees SET role_id=${uiSel.emp_r} WHERE id=${uiSel.emp_id}`, init);
       break;
     case 'update employee manager':
-      dbQuery(init, `UPDATE employees SET manager_id=${uiSel.m_id} WHERE id=${uiSel.emp_id}`);
+      queryDb(`UPDATE employees SET manager_id=${uiSel.m_id} WHERE id=${uiSel.emp_id}`, init);
       break;
     case 'exit':
       process.exit(0);
