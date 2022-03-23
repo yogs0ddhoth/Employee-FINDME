@@ -16,6 +16,9 @@ const menu = [
   'add an employee',
   'update an employee role',
   'update employee manager',
+  'delete a department',
+  'delete a role',
+  'delete an employee',
   'exit'
 ];
 
@@ -47,6 +50,15 @@ const MenuPrompt = [
   // If 'update employee manager' is selected:
   new Input('emp_id', 'Enter Employee Id:', answers => answers.menu == 'update employee manager'),
   new Input('m_id', 'Enter Manager Id (Enter NULL if employee is manager):', answers => answers.menu == 'update employee manager'),
+  
+  // 'If delete a department' is selected:
+  new Input('dep_id', 'Enter Department Id:', answers => answers.menu == 'delete a department'),
+  
+  // 'If delete a role' is selected:
+  new Input('r_id', 'Enter Role Id:', answers => answers.menu == 'delete a role'),
+  
+  // 'If delete an employee' is selected:
+  new Input('emp_id', 'Enter Employee Id:', answers => answers.menu == 'delete an employee')
 ];
 
 // Main functionality 
@@ -59,10 +71,14 @@ const init = async () => {
       queryDb('SELECT * FROM departments', init);
       break;
     case 'view all roles':
-      queryDb('SELECT * FROM roles', init);
+      queryDb(`
+        SELECT r.id, r.title, r.salary, d.name department 
+        FROM roles r LEFT JOIN departments d ON r.department_id = d.id`, init);
       break;
     case 'view all employees':
-      queryDb('SELECT * FROM employees', init);
+      queryDb(`
+        SELECT e.id, e.first_name, e.last_name, r.title, e.manager_id, r.salary, d.name department 
+        FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id`, init);
       break;
     case 'view department budget':
       queryDb(`
@@ -92,6 +108,15 @@ const init = async () => {
     case 'update employee manager':
       queryDb(`UPDATE employees SET manager_id=${uiSel.m_id} WHERE id=${uiSel.emp_id}`, init);
       break;
+    case 'delete a department':
+      queryDb(`DELETE FROM departments WHERE id=${uiSel.dep_id}`, init);
+      break;
+    case 'delete a role':
+      queryDb(`DELETE FROM roles WHERE id=${uiSel.r_id}`, init);
+      break;
+    case 'delete an employee':
+      queryDb(`DELETE FROM employees WHERE id=${uiSel.emp_id}`, init);
+      break;
     case 'exit':
       process.exit(0);
   }
@@ -100,9 +125,6 @@ const init = async () => {
 init();
 // default joined tables
 // `
-// SELECT e.id, e.first_name, e.last_name, r.title, e.manager_id, r.salary, d.name department 
-// FROM employees e 
-// LEFT JOIN roles r ON e.role_id = r.id 
-// LEFT JOIN departments d ON r.department_id = d.id;
+// SELECT e.id, e.first_name, e.last_name, r.title, e.manager_id, r.salary, d.name department FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id
 // `
 module.exports = init;
