@@ -41,7 +41,7 @@ const MenuPrompt = [
   new Input('m_id', 'Enter Manager Id (Enter NULL if employee is manager):', answers => answers.menu == 'add an employee'),
 
   // If 'view department budget' is selected:
-  new Input('dep_id', 'Enter Department Id:', answers => answers.menu == 'view department budget'),
+  new Input('dep_name', 'Enter Department Name:', answers => answers.menu == 'view department budget'),
 
   // If 'update an employee role' is selected:
   new Input('emp_id', 'Enter Employee Id:', answers => answers.menu == 'update an employee role'),
@@ -83,8 +83,8 @@ const init = async () => {
     case 'view department budget':
       queryDb(`
         SELECT d.name Department_Name, SUM(salary) Budget 
-        FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id 
-        WHERE r.department_id=${uiSel.dep_id}
+        FROM departments d LEFT JOIN roles r ON r.department_id = d.id LEFT JOIN employees e ON e.role_id = r.id 
+        WHERE d.name='${uiSel.dep_name}'
         `, init);
       break;
     case 'add a department':
