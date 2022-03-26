@@ -1,8 +1,8 @@
 INSERT INTO departments (name)
   VALUES
-        ('d_a'),
-        ('d_b'),
-        ('d_c');
+        ('d_1'),
+        ('d_2'),
+        ('d_3');
 
 INSERT INTO roles (title, salary, department_id)
   VALUES -- 'employees'
