@@ -70,16 +70,19 @@ const init = async () => {
     case 'view all departments':
       queryDb('SELECT * FROM departments', init);
       break;
+
     case 'view all roles':
       queryDb(`
         SELECT r.id, r.title, r.salary, d.name department 
         FROM roles r LEFT JOIN departments d ON r.department_id = d.id`, init);
       break;
+
     case 'view all employees':
       queryDb(`
         SELECT e.id, e.first_name, e.last_name, r.title, e.manager_id, r.salary, d.name department 
         FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id`, init);
       break;
+
     case 'view department budget':
       queryDb(`
         SELECT d.name Department_Name, SUM(salary) Budget 
@@ -87,44 +90,48 @@ const init = async () => {
         WHERE d.name='${uiSel.dep_name}'
         `, init);
       break;
+
     case 'add a department':
       queryDb(`INSERT INTO departments (name) VALUES ('${uiSel.name}')`, init);
       break;
+
     case 'add a role':
       queryDb(`
         INSERT INTO roles (title, salary, department_id)
         VALUES ('${uiSel.title}',${uiSel.salary},${uiSel.dep_id})
         `, init);
       break;
+
     case 'add an employee':
       queryDb(`
         INSERT INTO employees (first_name, last_name, role_id, manager_id) 
         VALUES ('${uiSel.f_name}','${uiSel.l_name}',${uiSel.r_id},${uiSel.m_id})
         `, init);
       break;
+
     case 'update an employee role':
       queryDb(`UPDATE employees SET role_id=${uiSel.emp_r} WHERE id=${uiSel.emp_id}`, init);
       break;
+
     case 'update employee manager':
       queryDb(`UPDATE employees SET manager_id=${uiSel.m_id} WHERE id=${uiSel.emp_id}`, init);
       break;
+
     case 'delete a department':
       queryDb(`DELETE FROM departments WHERE id=${uiSel.dep_id}`, init);
       break;
+
     case 'delete a role':
       queryDb(`DELETE FROM roles WHERE id=${uiSel.r_id}`, init);
       break;
+
     case 'delete an employee':
       queryDb(`DELETE FROM employees WHERE id=${uiSel.emp_id}`, init);
       break;
+      
     case 'exit':
       process.exit(0);
   }
 };
 
 init();
-// default joined tables
-// `
-// SELECT e.id, e.first_name, e.last_name, r.title, e.manager_id, r.salary, d.name department FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id
-// `
-module.exports = init;
